@@ -28,15 +28,23 @@ class Sorteo
     #[ORM\Column]
     private ?float $premio = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sorteos')]
-    private ?User $winner = null;
 
     #[ORM\OneToMany(mappedBy: 'sorteo', targetEntity: NumeroLoteria::class)]
-    private Collection $numeroLoterias;
+    private Collection $numerosLoteria;
+
+    #[ORM\OneToOne(mappedBy: 'tramiteSorteo', cascade: ['persist', 'remove'])]
+    private ?Tramite $tramite = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $precioNumero = null;
+
+    #[ORM\OneToMany(mappedBy: 'idNumero', targetEntity: NumeroLoteria::class)]
+    private Collection $numeroId;
 
     public function __construct()
     {
-        $this->numeroLoterias = new ArrayCollection();
+        $this->numerosLoteria = new ArrayCollection();
+        $this->numeroId = new ArrayCollection();
     }
 
 
@@ -68,18 +76,7 @@ class Sorteo
 
         return $this;
     }
-
-    public function getCantidadNumeros(): ?int
-    {
-        return $this->cantidadNumeros;
-    }
-
-    public function setCantidadNumeros(int $cantidadNumeros): static
-    {
-        $this->cantidadNumeros = $cantidadNumeros;
-
-        return $this;
-    }
+   
 
     public function getPremio(): ?float
     {
@@ -93,14 +90,37 @@ class Sorteo
         return $this;
     }
 
-    public function getWinner(): ?User
+
+    public function getTramite(): ?Tramite
     {
-        return $this->winner;
+        return $this->tramite;
     }
 
-    public function setWinner(?User $winner): static
+    public function setTramite(?Tramite $tramite): static
     {
-        $this->winner = $winner;
+        // unset the owning side of the relation if necessary
+        if ($tramite === null && $this->tramite !== null) {
+            $this->tramite->setTramiteSorteo(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($tramite !== null && $tramite->getTramiteSorteo() !== $this) {
+            $tramite->setTramiteSorteo($this);
+        }
+
+        $this->tramite = $tramite;
+
+        return $this;
+    }
+
+    public function getPrecioNumero(): ?float
+    {
+        return $this->precioNumero;
+    }
+
+    public function setPrecioNumero(?float $precioNumero): static
+    {
+        $this->precioNumero = $precioNumero;
 
         return $this;
     }
@@ -108,32 +128,34 @@ class Sorteo
     /**
      * @return Collection<int, NumeroLoteria>
      */
-    public function getNumeroLoterias(): Collection
+    public function getNumeroId(): Collection
     {
-        return $this->numeroLoterias;
+        return $this->numeroId;
     }
 
-    public function addNumeroLoteria(NumeroLoteria $numeroLoteria): static
+    public function addNumeroId(NumeroLoteria $numeroId): static
     {
-        if (!$this->numeroLoterias->contains($numeroLoteria)) {
-            $this->numeroLoterias->add($numeroLoteria);
-            $numeroLoteria->setSorteo($this);
+        if (!$this->numeroId->contains($numeroId)) {
+            $this->numeroId->add($numeroId);
+            $numeroId->setIdNumero($this);
         }
 
         return $this;
     }
 
-    public function removeNumeroLoteria(NumeroLoteria $numeroLoteria): static
+    public function removeNumeroId(NumeroLoteria $numeroId): static
     {
-        if ($this->numeroLoterias->removeElement($numeroLoteria)) {
+        if ($this->numeroId->removeElement($numeroId)) {
             // set the owning side to null (unless already changed)
-            if ($numeroLoteria->getSorteo() === $this) {
-                $numeroLoteria->setSorteo(null);
+            if ($numeroId->getIdNumero() === $this) {
+                $numeroId->setIdNumero(null);
             }
         }
 
         return $this;
     }
+
+   
 
    
 

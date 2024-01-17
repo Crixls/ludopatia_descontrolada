@@ -17,14 +17,14 @@ class Tramite
     #[ORM\Column]
     private ?int $tipo = null;
 
-    #[ORM\Column]
-    private ?float $importe = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'tramites')]
     private ?User $user = null;
+
+    #[ORM\OneToOne(inversedBy: 'tramite', cascade: ['persist', 'remove'])]
+    private ?Sorteo $tramiteSorteo = null;
 
     public function getId(): ?int
     {
@@ -43,17 +43,7 @@ class Tramite
         return $this;
     }
 
-    public function getImporte(): ?float
-    {
-        return $this->importe;
-    }
 
-    public function setImporte(float $importe): static
-    {
-        $this->importe = $importe;
-
-        return $this;
-    }
 
     public function getDate(): ?\DateTimeInterface
     {
@@ -75,6 +65,18 @@ class Tramite
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getTramiteSorteo(): ?Sorteo
+    {
+        return $this->tramiteSorteo;
+    }
+
+    public function setTramiteSorteo(?Sorteo $tramiteSorteo): static
+    {
+        $this->tramiteSorteo = $tramiteSorteo;
 
         return $this;
     }

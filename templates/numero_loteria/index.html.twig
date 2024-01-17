@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}NumeroLoteria index{% endblock %}
+
+{% block body %}
+    <h1>NumeroLoteria index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Number</th>
+                <th>Price</th>
+                <th>FechaLimite</th>
+                <th>Estado</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for numero_loterium in numero_loterias %}
+            <tr>
+                <td>{{ numero_loterium.id }}</td>
+                <td>{{ numero_loterium.number }}</td>
+                <td>{{ numero_loterium.price }}</td>
+                <td>{{ numero_loterium.fechaLimite ? numero_loterium.fechaLimite|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ numero_loterium.estado }}</td>
+                <td>
+                    <a href="{{ path('app_numero_loteria_show', {'id': numero_loterium.id}) }}">show</a>
+                    <a href="{{ path('app_numero_loteria_edit', {'id': numero_loterium.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_numero_loteria_new') }}">Create new</a>
+{% endblock %}

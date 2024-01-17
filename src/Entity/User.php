@@ -47,10 +47,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Tramite::class)]
     private Collection $tramites;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: NumeroLoteria::class)]
+    private Collection $numeros;
+
     public function __construct()
     {
         $this->sorteos = new ArrayCollection();
         $this->tramites = new ArrayCollection();
+        $this->numeros = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -213,6 +217,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($tramite->getUser() === $this) {
                 $tramite->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NumeroLoteria>
+     */
+    public function getNumeros(): Collection
+    {
+        return $this->numeros;
+    }
+
+    public function addNumero(NumeroLoteria $numero): static
+    {
+        if (!$this->numeros->contains($numero)) {
+            $this->numeros->add($numero);
+            $numero->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNumero(NumeroLoteria $numero): static
+    {
+        if ($this->numeros->removeElement($numero)) {
+            // set the owning side to null (unless already changed)
+            if ($numero->getUser() === $this) {
+                $numero->setUser(null);
             }
         }
 
